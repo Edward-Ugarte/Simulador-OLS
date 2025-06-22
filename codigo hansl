@@ -1,0 +1,68 @@
+set seed 123
+matrix B = zeros(1000, 3)
+
+# Simulación de 1,000 regresiones
+loop i=1..1000 --quiet
+    matrix Z = mnormal(100, 3)  # x1, x2, u
+    matrix x1 = Z[,1]
+    matrix x2 = Z[,2]
+    matrix u  = Z[,3]
+    matrix X = ones(100,1) ~ x1 ~ x2
+    matrix y = 2 + 1.5 * x1 - 0.5 * x2 + u
+    matrix b = mols(y, X)
+    matrix B[i,] = b'
+endloop
+
+# Mostrar primeras 10 simulaciones
+printf "\n📌 Primeras 10 simulaciones:\n"
+print B[1:10,]
+
+# Calcular media y desviación estándar
+matrix medias = meanc(B)
+matrix desvios = sdc(B)
+
+# Mostrar resumen estadístico
+printf "\n📊 Resumen estadístico de los coeficientes (1,000 simulaciones):\n"
+printf "Coeficiente   |   Media   | Desv.Estándar\n"
+printf "------------------------------------------\n"
+printf "Beta_0        | %8.4f  | %8.4f\n", medias[1], desvios[1]
+printf "Beta_1        | %8.4f  | %8.4f\n", medias[2], desvios[2]
+printf "Beta_2        | %8.4f  | %8.4f\n", medias[3], desvios[3]
+
+# Calcular percentiles 2.5% y 97.5%
+matrix p_b0 = quantile(B[,1], {0.025, 0.975})
+matrix p_b1 = quantile(B[,2], {0.025, 0.975})
+matrix p_b2 = quantile(B[,3], {0.025, 0.975})
+
+# Mostrar intervalos de confianza
+printf "\n📈 Intervalos de confianza al 95%% (percentiles):\n"
+printf "Beta_0: [%.4f, %.4f]\n", p_b0[1], p_b0[2]
+printf "Beta_1: [%.4f, %.4f]\n", p_b1[1], p_b1[2]
+printf "Beta_2: [%.4f, %.4f]\n", p_b2[1], p_b2[2]
+
+# Añadir filas de media y desviación estándar a la matriz
+matrix B = B | medias
+matrix B = B | desvios
+
+# Exportar a CSV con etiquetas
+outfile "betas_1000_con_etiquetas.csv"
+    printf "Etiqueta,Beta_0,Beta_1,Beta_2\n"
+    loop i=1..1002
+        if i <= 1000
+            printf "Iteración_%d,%.5f,%.5f,%.5f\n", i, B[i,1], B[i,2], B[i,3]
+        elif i == 1001
+            printf "Media,%.5f,%.5f,%.5f\n", B[i,1], B[i,2], B[i,3]
+        else
+            printf "DesvStd,%.5f,%.5f,%.5f\n", B[i,1], B[i,2], B[i,3]
+        endif
+    endloop
+outfile --close
+
+# Mostrar últimas 10 simulaciones + estadísticas como tabla integrada
+printf "\n🧾 Últimas 10 simulaciones + estadísticas:\n"
+printf "Fila       β₀           β₁           β₂\n"
+printf "────────────────────────────────────────────────────\n"
+loop i=991..1002
+    string etiqueta = (i <= 1000) ? sprintf("%4d", i) : (i == 1001) ? "Media" : "DesvStd"
+    printf "%-10s %12.5f  %12.5f  %12.5f\n", etiqueta, B[i,1], B[i,2], B[i,3]
+endloop
