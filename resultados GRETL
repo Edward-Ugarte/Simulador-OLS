@@ -1,4 +1,4 @@
-versión de Gretl 2025b
+noversión de Gretl 2025b
 Sesión actual: 2025-06-22 04:14
 
 ? set seed 123
@@ -9,17 +9,17 @@ Se ha reemplazado la matriz B
 ? loop i=1..1000 --quiet
 > matrix Z = mnormal(100, 3)  # x1, x2, u
 > matrix x1 = 
-> matrix x2 = Z[,2]
-> matrix u  = Z[,3]
+> matrix x2 = 
+> matrix u  = 
 > matrix X =  
-> matrix y = 2 + 1.5 * x1 - 0.5 * x2 + u
-> matrix b = mols(y, X)
+> matrix y = 
+> matrix b = (y, X)
 > matrix B[i,] = b'
 > endloop
 # Mostrar primeras 10 simulaciones
 
 📌 Primeras 10 simulaciones:
-? print B[1:10,]
+?
       2.1811       1.6344     -0.68836 
       2.1222       1.4609     -0.39844 
       1.7712       1.7389     -0.55004 
@@ -34,7 +34,7 @@ Se ha reemplazado la matriz B
 # Calcular media y desviación estándar
 ? matrix medias = meanc(B)
 Se ha reemplazado la matriz medias
-? matrix desvios = sdc(B)
+? matrix desvios =
 Se ha reemplazado la matriz desvios
 # Mostrar resumen estadístico
 
