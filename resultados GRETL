@@ -8,10 +8,10 @@ Se ha reemplazado la matriz B
 # Simulación de 1,000 regresiones
 ? loop i=1..1000 --quiet
 > matrix Z = mnormal(100, 3)  # x1, x2, u
-> matrix x1 = Z[,1]
+> matrix x1 = 
 > matrix x2 = Z[,2]
 > matrix u  = Z[,3]
-> matrix X = ones(100,1) ~ x1 ~ x2
+> matrix X =  
 > matrix y = 2 + 1.5 * x1 - 0.5 * x2 + u
 > matrix b = mols(y, X)
 > matrix B[i,] = b'
